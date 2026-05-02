@@ -19,6 +19,8 @@ namespace CalendarApp.GUI
             InitializeComponent();
             dtpStartTime.Value = selectedDate.Date.AddHours(8);
             dtpEndTime.Value = selectedDate.Date.AddHours(9);
+            numReminderMinutes.Enabled = false;
+            txtReminderMessage.Enabled = false;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
@@ -27,10 +29,13 @@ namespace CalendarApp.GUI
             string location = txtLocation.Text;
             DateTime start = dtpStartTime.Value;
             DateTime end = dtpEndTime.Value;
+            bool hasReminder = chkHasReminder.Checked;
+            int reminderMinutes = (int)numReminderMinutes.Value;
+            string reminderMessage = txtReminderMessage.Text;
 
             int currentUserId = LoginForm.CurrentLoggedInUser.Id;
 
-            string result = apptService.CreateAppointment(currentUserId, title, location, start, end);
+            string result = apptService.CreateAppointment(currentUserId, title, location, start, end, hasReminder, reminderMinutes, reminderMessage);
 
             if (result == "ERROR_EMPTY_NAME")
             {
@@ -56,7 +61,7 @@ namespace CalendarApp.GUI
                                              "Xung đột thời gian", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (answer == DialogResult.Yes)
                 {
-                    apptService.CreateAppointment(currentUserId, title, location, start, end, true);
+                    apptService.CreateAppointment(currentUserId, title, location, start, end, hasReminder, reminderMinutes, reminderMessage, true);
                     MessageBox.Show("Đã thay thế lịch hẹn thành công!");
                     this.Close();
                 }
@@ -66,6 +71,12 @@ namespace CalendarApp.GUI
                 MessageBox.Show("Thêm lịch hẹn thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
             }
+        }
+
+        private void chkHasReminder_CheckedChanged(object sender, EventArgs e)
+        {
+            numReminderMinutes.Enabled = chkHasReminder.Checked;
+            txtReminderMessage.Enabled = chkHasReminder.Checked;
         }
     }
 }

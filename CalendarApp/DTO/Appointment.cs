@@ -19,5 +19,9 @@ namespace CalendarApp.DTO
         //foreign key
         public int UserId { get; set; }
         public User User { get; set; }
+
+        public bool HasReminder { get; set; }         
+        public int ReminderMinutesBefore { get; set; } 
+        public string ReminderMessage { get; set; }
     }
 }

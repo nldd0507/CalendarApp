@@ -55,7 +55,7 @@ namespace CalendarApp.GUI
                 bool isGroup = Convert.ToBoolean(row.Cells["Là_Họp_Nhóm"].Value);
                 if (isGroup)
                 {
-                    row.DefaultCellStyle.BackColor = Color.LightSkyBlue; // Tô màu xanh nhạt
+                    row.DefaultCellStyle.BackColor = Color.LightSkyBlue; 
                     row.DefaultCellStyle.ForeColor = Color.DarkBlue;
                 }
             }
@@ -103,7 +103,8 @@ namespace CalendarApp.GUI
             if (LoginForm.CurrentLoggedInUser == null) return;
 
             AppointmentService service = new AppointmentService();
-            var upcoming = service.GetUpcomingAppointments(LoginForm.CurrentLoggedInUser.Id);
+
+            var upcoming = service.GetAppointmentsToRemind(LoginForm.CurrentLoggedInUser.Id);
 
             foreach (var appt in upcoming)
             {
@@ -111,15 +112,15 @@ namespace CalendarApp.GUI
                 {
                     remindedAppointmentIds.Add(appt.Id);
 
-                    MessageBox.Show($"[NHẮC NHỞ]: Sắp đến giờ thực hiện lịch hẹn: \n\n" +
-                                    $"Tên: {appt.Title}\n" +
-                                    $"Lúc: {appt.StartTime.ToString("HH:mm")}\n" +
+                    MessageBox.Show($"[NHẮC NHỞ]: {appt.ReminderMessage}\n\n" +
+                                    $"Sự kiện: {appt.Title}\n" +
+                                    $"Bắt đầu lúc: {appt.StartTime.ToString("HH:mm")}\n" +
                                     $"Địa điểm: {appt.Location}",
                                     "Smart Calendar Reminder",
                                     MessageBoxButtons.OK,
                                     MessageBoxIcon.Information,
                                     MessageBoxDefaultButton.Button1,
-                                    MessageBoxOptions.DefaultDesktopOnly); 
+                                    MessageBoxOptions.DefaultDesktopOnly);
                 }
             }
         }

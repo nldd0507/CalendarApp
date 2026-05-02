@@ -12,7 +12,7 @@ namespace CalendarApp.BLL
 {
     public class AppointmentService
     {
-        public string CreateAppointment(int userId, string title, string location, DateTime start, DateTime end, bool forceReplace = false)
+        public string CreateAppointment(int userId, string title, string location, DateTime start, DateTime end,  bool hasReminder, int reminderMinutes, string reminderMessage, bool forceReplace = false)
         {
             if (string.IsNullOrWhiteSpace(title)) return "ERROR_EMPTY_NAME";
 
@@ -49,7 +49,11 @@ namespace CalendarApp.BLL
                     StartTime= start,
                     EndTime= end,
                     IsGroupMeeting = false,
-                    UserId=userId
+                    UserId=userId,
+
+                    HasReminder = hasReminder,
+                    ReminderMinutesBefore = reminderMinutes,
+                    ReminderMessage = reminderMessage
                 };
 
                 db.Appointments.Add(newAppt);
@@ -83,18 +87,18 @@ namespace CalendarApp.BLL
                 return false;
             }
         }
-        public List<Appointment> GetUpcomingAppointments(int userId)
+        public List<Appointment> GetAppointmentsToRemind(int userId)
         {
             using (var db = new AppDbContext())
             {
                 DateTime now = DateTime.Now;
-                DateTime oneMinuteLater = now.AddMinutes(1);
+                var upcomingAppts = db.Appointments
+                 .Where(a => a.UserId == userId && a.HasReminder && a.StartTime >= now)
+                 .ToList();
 
-                return db.Appointments
-                         .Where(a => a.UserId == userId &&
-                                     a.StartTime >= now &&
-                                     a.StartTime <= oneMinuteLater)
-                         .ToList();
+                return upcomingAppts
+                 .Where(a => now >= a.StartTime.AddMinutes(-a.ReminderMinutesBefore))
+                 .ToList();
             }
         }
     }      
